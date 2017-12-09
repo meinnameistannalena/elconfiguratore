@@ -61,69 +61,64 @@ import jspdf from "jspdf";
 
 export default {
   name: "Konfigurator",
- 
+
   data() {
     this.clickedAdd = [];
     this.clickedRemove = [];
     this.imageCounter = 0;
-    this.dropdown = [];  
-     
-   
-    this.categoryList =['Galaxy', 'Kaffee', 'Sonstiges'];
-    
-    
-    
+    this.dropdown = [];
+
+    this.categoryList = ["Galaxy", "Kaffee", "Sonstiges"];
+
     this.categories = {
-    'Galaxy': ['galaxy01.png', 'galaxy02.png', 'galaxy03.png', 'galaxy04.png'],
-    'Sonstiges': ['fingerfuchs.png', 'love.jpg' ],
-    'Kaffee': ['kaff.png',  'toGoCup.svg']
+      Galaxy: ["galaxy01.png", "galaxy02.png", "galaxy03.png", "galaxy04.png"],
+      Sonstiges: ["fingerfuchs.png", "love.jpg"],
+      Kaffee: ["kaff.png", "toGoCup.svg"]
     };
-    
-   
+
     return {
       msg: "Konfigurator",
       images: [],
-     
-      selected: 'Galaxy',
-      pic_url: 'http://coolwildlife.com/wp-content/uploads/galleries/post-3004/Fox%20Picture%20003.jpg',
-      leftPos: '0px',
-      topPos: '0px',
+
+      selected: "Galaxy",
+      pic_url:
+        "http://coolwildlife.com/wp-content/uploads/galleries/post-3004/Fox%20Picture%20003.jpg",
+      leftPos: "0px",
+      topPos: "0px",
       classObject: {
         active: true,
-        'text-danger': false
+        "text-danger": false
       }
     };
   },
 
   computed: {
-  backgroundStyle:function(){
-   	return {
-      'left': this.leftPos,
-      //'top': this.leftPos
+    backgroundStyle: function() {
+      return {
+        left: this.leftPos + "px",
+        top: this.topPos + "px"
+      };
     }
-   }
-},
-  
+  },
+
   methods: {
-    changeCategory(){
+    changeCategory() {
       this.dropdown = [];
       var newImages = this.categories[this.selected];
-      for(var m in newImages){
-       this.dropdown.push({
-        id: newImages[m],
-        url: "/static/"+ newImages[m]
-      });
+      for (var m in newImages) {
+        this.dropdown.push({
+          id: newImages[m],
+          url: "/static/" + newImages[m]
+        });
       }
     },
     mark() {
       if (event.target.classList.contains("elementMarked")) {
-        
         var index = this.clickedAdd.indexOf(event.target.id);
         if (index > -1) {
           this.clickedAdd.splice(index, 1);
         }
         event.target.className = "element";
-
       } else {
         event.target.className += " elementMarked";
         this.clickedAdd.push(event.target.id);
@@ -136,7 +131,10 @@ export default {
         if (index > -1) {
           this.clickedRemove.splice(index, 1);
         }
-       event.target.className = event.target.className.replace("elementRemoved", "");
+        event.target.className = event.target.className.replace(
+          "elementRemoved",
+          ""
+        );
       } else {
         event.target.className += " elementRemoved";
         this.clickedRemove.push(event.target.id);
@@ -145,24 +143,22 @@ export default {
 
     addImageToCanvas() {
       var canvas = document.getElementById("canvas");
-      var img = document.createElement("img");
+      var img = event.target;
       var coordinates = this.calculateCoordinates(canvas, img, 0.3);
-      this.leftPos = '100px';
-      this.topPos = '100px';
+      this.leftPos = coordinates.x;
+      this.topPos = coordinates.y;
 
-      var imageId = this.imageCounter++
+      var imageId = this.imageCounter++;
 
       this.images.push({
         id: imageId,
         url: event.target.src,
-        width: coordinates[2],
-        height: coordinates[3]
-     });
-
+        width: coordinates.width,
+        height: coordinates.height
+      });
     },
 
     addAll() {
-      
       for (var image in this.clickedAdd) {
         var src = "/static/" + this.clickedAdd[image];
         var canvas = document.getElementById("canvas");
@@ -179,21 +175,24 @@ export default {
           height: coordinates[3]
         });
 
-      
-       // alert(document.getElementById(this.clickedAdd[image]).className);
+        // alert(document.getElementById(this.clickedAdd[image]).className);
         //document.getElementById(this.clickedAdd[image]).className="element";
       }
-    
-      this.clickedAdd= [];
+
+      this.clickedAdd = [];
     },
 
     calculateCoordinates(canvas, image, transformFactor) {
       var newImageHeight = canvas.clientHeight * transformFactor; // 256
-      var newImageWidth = newImageHeight / image.height * image.width; // 195
+      var newImageWidth = newImageHeight / image.naturalHeight * image.naturalWidth; // 195
       var x = canvas.offsetLeft + (canvas.clientWidth - newImageWidth) / 2; //90
-      var y = canvas.offsetTop + (canvas.clientWidth - newImageHeight) / 2; //140
-      
-      return [x, y, newImageWidth, newImageHeight];
+      var y = canvas.offsetTop + (canvas.clientHeight - newImageHeight) / 2; //140
+      return {
+        x: x,
+        y: y,
+        width: newImageWidth,
+        height: newImageHeight
+      }
     },
 
     reset() {
@@ -222,22 +221,22 @@ export default {
 
     deleteImages() {
       for (var t in this.clickedRemove) {
-        for(var i = 0; i < this.images.length; i++) {
-          if(this.images[i].id == this.clickedRemove[t]) { 
-              this.images.splice(i, 1);         
+        for (var i = 0; i < this.images.length; i++) {
+          if (this.images[i].id == this.clickedRemove[t]) {
+            this.images.splice(i, 1);
           }
         }
       }
-      this.clickedRemove=[];
+      this.clickedRemove = [];
     },
 
-    removeImageByDoubleClick (){
-      for(var i = 0; i < this.images.length; i++) {
-          if(this.images[i].id == event.target.id) { 
-              this.images.splice(i, 1);         
-          }
+    removeImageByDoubleClick() {
+      for (var i = 0; i < this.images.length; i++) {
+        if (this.images[i].id == event.target.id) {
+          this.images.splice(i, 1);
         }
-      this.clickedRemove=[];
+      }
+      this.clickedRemove = [];
     },
 
     createPDF() {
@@ -248,26 +247,30 @@ export default {
       html2canvas(canvas, {
         scale: 2,
         onrendered: function(canvas) {
-          var doc = new jspdf()
+          var doc = new jspdf();
           //doc.internal.scaleFactor = 1.33; tut das was?
-          doc.addImage(canvas.toDataURL('image/png'), 'JPEG', 10, 14.5, 190, 268)
-          doc.save('output.pdf');
-        },
-
+          doc.addImage(
+            canvas.toDataURL("image/png"),
+            "JPEG",
+            10,
+            14.5,
+            190,
+            268
+          );
+          doc.save("output.pdf");
+        }
       });
       canvas.style.border = "1px solid black";
     }
   },
   created() {
-    var defaultCategory = this.categories['Galaxy']
-      for(var m in defaultCategory){
-        this.dropdown.push({
-          
-          id: defaultCategory[m],
-          url: "/static/"+ defaultCategory[m]
+    var defaultCategory = this.categories["Galaxy"];
+    for (var m in defaultCategory) {
+      this.dropdown.push({
+        id: defaultCategory[m],
+        url: "/static/" + defaultCategory[m]
       });
-      } 
-   
+    }
 
     // target elements with the "draggable" class
     interact(".resize-drag")
@@ -321,12 +324,8 @@ export default {
         target.textContent =
           Math.round(event.rect.width) + "×" + Math.round(event.rect.height);
       })
- 
-
-      .on('tap', this.markDeleted.bind(this));
-      //.on('dbltap', this.removeI.bind(this));
-  
- ;
+      .on("tap", this.markDeleted.bind(this));
+    //.on('dbltap', this.removeI.bind(this));
 
     function dragMoveListener(event) {
       var target = event.target,
@@ -351,7 +350,6 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-
 .element:hover {
   opacity: 0.85;
 }
@@ -369,7 +367,6 @@ export default {
   opacity: 1;
 }
 
-
 button {
   background-color: rgba(41, 56, 80, 1);
   /*margin-left: auto;
@@ -379,9 +376,9 @@ button {
   /*font-size: 10px;*/
   width: 23%;
   color: white;
-   background-size: 40%;
-   background-repeat: no-repeat;
-   background-position: center;
+  background-size: 40%;
+  background-repeat: no-repeat;
+  background-position: center;
 }
 
 /* #addButton {
@@ -396,10 +393,9 @@ button {
   background-image: url("/static/delete-button.png");
 } */
 
-.resize-drag{
+.resize-drag {
   position: absolute;
 }
-
 
 #categories {
   margin-left: 0px;
@@ -411,13 +407,13 @@ button {
   width: 100%;
 }
 
-#allButtons{
+#allButtons {
   margin-top: 5px;
   width: 230px;
 }
 
 /* 240 x 320 (mobile) */
-.container{
+.container {
   margin-left: auto;
   margin-right: auto;
 }
@@ -427,8 +423,8 @@ button {
   height: 324px;
 }
 #test {
-  width:1000px;
-  height:1000px;
+  width: 1000px;
+  height: 1000px;
   position: absolute;
 }
 #elementsOfChoice {
@@ -440,50 +436,50 @@ button {
   margin-left: 0px;
   overflow-x: scroll;
   white-space: nowrap;
-  }
-  .element {
-    margin-top: 9px;
-    width: 60px;
-    display: inline-block;
-  }
+}
+.element {
+  margin-top: 9px;
+  width: 60px;
+  display: inline-block;
+}
 
-  #logo{
-    width: 130px;
-    position: absolute;
-    top: 530px;
-    left: 250px;
-  }
+#logo {
+  width: 130px;
+  position: absolute;
+  top: 530px;
+  left: 250px;
+}
 
-  .buttons {
-    width: 230px;
-  }
+.buttons {
+  width: 230px;
+}
 
-   #logo{
-    width: 70px;
-    position: absolute;
-    top: 300px;
-    left: 160px;
-   }
+#logo {
+  width: 70px;
+  position: absolute;
+  top: 300px;
+  left: 160px;
+}
 
 /* 320 x 480 (mobile)*/
 @media (min-width: 320px) {
-  .container{
-  margin-left: auto;
-   margin-right: auto;
-}
+  .container {
+    margin-left: auto;
+    margin-right: auto;
+  }
   #canvas {
-  width: 315px;
-  height: 444px;
-}
+    width: 315px;
+    height: 444px;
+  }
 
-#elementsOfChoice {
-  width: 315px;
-  height: 117px;
-  padding: 6px;
-  margin-top: 5px;
-  margin-left: 0px;
-  overflow-x: scroll;
-  white-space: nowrap;
+  #elementsOfChoice {
+    width: 315px;
+    height: 117px;
+    padding: 6px;
+    margin-top: 5px;
+    margin-left: 0px;
+    overflow-x: scroll;
+    white-space: nowrap;
   }
   .element {
     margin-top: 6px;
@@ -494,27 +490,25 @@ button {
   .buttons {
     width: 315px;
   }
-   #logo{
+  #logo {
     width: 100px;
     position: absolute;
     top: 410px;
     left: 190px;
-   }
+  }
 
-   #categories  {
-  width: 315px;
+  #categories {
+    width: 315px;
+  }
+
+  #allButtons {
+    width: 315px;
+  }
 }
 
-#allButtons{
-  width: 315px;
-}
-
-}
-
-
-/* 480 x 640 (small tablet) UNTEREINANDER*/ 
+/* 480 x 640 (small tablet) UNTEREINANDER*/
 @media (min-width: 480px) {
-  .container{
+  .container {
     margin-left: auto;
     margin-right: auto;
   }
@@ -542,25 +536,24 @@ button {
     width: 430px;
   }
 
-   #logo{
+  #logo {
     width: 120px;
     position: absolute;
     top: 560px;
     left: 280px;
   }
-  #categories  {
-  width: 430px;
-}
+  #categories {
+    width: 430px;
+  }
 
-#allButtons{
-  width: 430px;
-}
-
+  #allButtons {
+    width: 430px;
+  }
 }
 
 /* 768 x 1024 (tablet - portrait) NEBENEINANDER*/
 @media (min-width: 768px) {
-  .container{
+  .container {
     margin-left: auto;
     margin-right: auto;
   }
@@ -576,35 +569,35 @@ button {
     margin-top: 0px;
     margin-left: 10px;
   }
-   .element {
+  .element {
     width: 120px;
     display: block;
     margin-left: auto;
     margin-right: auto;
     margin-bottom: 10px;
   }
-  #logo{
+  #logo {
     width: 130px;
     position: absolute;
     top: 524px;
     left: 240px;
-   }
+  }
   .buttons {
     width: 405px;
   }
 
-   #logo{
+  #logo {
     width: 130px;
     position: absolute;
     top: 520px;
     left: 235px;
   }
-  #categories  {
+  #categories {
     width: 170px;
     margin-left: 10px;
-  } 
+  }
 
-  #allButtons{
+  #allButtons {
     width: 405px;
   }
 }
@@ -614,7 +607,7 @@ button {
 Faktor 1,41 754
 */
 @media (min-width: 1024px) {
-  .container{
+  .container {
     margin-left: auto;
     margin-right: auto;
   }
@@ -629,7 +622,7 @@ Faktor 1,41 754
     margin-left: 10px;
     overflow-y: scroll;
   }
-   .element {
+  .element {
     width: 130px;
     display: block;
     margin-left: auto;
@@ -640,29 +633,27 @@ Faktor 1,41 754
   .buttons {
     width: 502px;
   }
-   #logo{
+  #logo {
     width: 130px;
     position: absolute;
     top: 650px;
     left: 330px;
   }
-  #categories  {
-  width: 200px;
+  #categories {
+    width: 200px;
     margin-left: 10px;
-}
+  }
 
-#allButtons{
-  width: 502px;
-
-}
-
+  #allButtons {
+    width: 502px;
+  }
 }
 
 /* Larger than Desktop HD */
 @media (min-width: 1200px) {
-  .container{
-  margin-left: auto;
-   margin-right: auto;
+  .container {
+    margin-left: auto;
+    margin-right: auto;
   }
   #canvas {
     width: 599px;
@@ -671,7 +662,7 @@ Faktor 1,41 754
   #elementsOfChoice {
     width: 210px;
     height: 844px;
-    margin-left: 15px;;
+    margin-left: 15px;
     overflow-y: scroll;
   }
   .element {
@@ -684,22 +675,19 @@ Faktor 1,41 754
   .buttons {
     width: 599px;
   }
-  #logo{
+  #logo {
     width: 140px;
     position: absolute;
     top: 785px;
     left: 410px;
- }
-  #categories  {
-    width: 210px;
-    margin-left: 15px;;
-    }
-    #allButtons{
-      width: 599px;
-    }
-
   }
- 
-
+  #categories {
+    width: 210px;
+    margin-left: 15px;
+  }
+  #allButtons {
+    width: 599px;
+  }
+}
 </style>
 

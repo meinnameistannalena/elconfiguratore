@@ -107,9 +107,6 @@ export default {
 
   methods: {
     changeCategory() {
-
-      
-
       for (var m in this.clickedAdd) {
         this.clickedAdd[image].className = "element";
       }
@@ -466,9 +463,9 @@ button:focus {
   white-space: nowrap;
 }
 .element {
+  height: 60px;
   margin-top: 9px;
-  width: 60px;
-  display: inline-block;
+  margin-right: 5px; 
 }
 
 #logo {
@@ -510,10 +507,9 @@ button:focus {
     white-space: nowrap;
   }
   .element {
-    margin-top: 6px;
-    width: 90px;
-    display: inline-block;
-    margin-right: 10px;
+    height: 85px;
+    margin-top: 8px;
+    margin-right: 6px; 
   }
   .buttons {
     width: 315px;
@@ -555,10 +551,9 @@ button:focus {
     white-space: nowrap;
   }
   .element {
-    margin-top: 7px;
-    width: 90px;
-    display: inline-block;
-    margin-right: 10px;
+    height: 90px;
+    margin-top: 9px;
+    margin-right: 7px;     
   }
   .buttons {
     width: 430px;
@@ -598,6 +593,7 @@ button:focus {
     margin-left: 10px;
   }
   .element {
+    height: auto;
     width: 120px;
     display: block;
     margin-left: auto;

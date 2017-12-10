@@ -6,6 +6,7 @@
      <link rel="stylesheet" href="/static/normalize.css">
 
     <h1 style="text-align: center">EL CONFIGURATORE</h1>
+   
     <div class="container">
 
         <div class="row">
@@ -17,7 +18,7 @@
 
           <div id="elementsOfChoice" class="four columns" >
             
-            <img v-for="(value, key, index) in this.dropdown" :key="index" :id="value.id" :src="value.url" class="element" @dblclick="addImageToCanvas()" @click="mark()">
+            <img v-for="(value, key, index) in this.dropdown" :key="index" :id="value.id" :src="value.url" class="element" @dblclick="addSingleImageToCanvas()" @click="mark()">
           </div>
 
       </div>
@@ -25,9 +26,9 @@
        <div class="row">
 
           <div id="allButtons" class="eight columns">
-            <button id="addButton" class="fontButton" @click="addAll()">Hinzufügen</button>
-            <button id="deleteButton" class="imageButton" @click="deleteImages()">Löschen</button>
-            <button id="resetButton" class="imageButton" @click="reset()">Reset</button>
+            <button id="addButton" class="fontButton" @click="addAll()">&nbsp;</button>
+            <button id="deleteButton" class="imageButton" @click="deleteImages()">&nbsp;</button>
+            <button id="resetButton" class="imageButton" @click="reset()">&nbsp;</button>
              <button id="pdfButton" class="fontButton" @click="createPDF()">Download</button>
 
           </div>
@@ -68,14 +69,17 @@ export default {
     this.imageCounter = 0;
     this.dropdown = [];
 
-    this.categoryList = ["Galaxy", "Kaffee", "Sonstiges"];
+    this.categoryList = ["Galaxy", "Unicorn ","Kaffee", "Sonstiges"];
 
     this.categories = {
-      Galaxy: ["galaxy01.png", "galaxy02.png", "galaxy03.png", "galaxy04.png"],
-      Sonstiges: ["fingerfuchs.png", "love.jpg"],
-      Kaffee: ["kaff.png", "toGoCup.svg"]
+      Galaxy: ["galaxy001.png", "galaxy002.png", "galaxy003.png", "galaxy004.png","galaxy005.png", "galaxy006.png", "galaxy007.png", "galaxy008.png"],
+      Unicorn: ["unicorn001.png",  "unicorn003.png","unicorn002.png"],
+      Sonstiges: ["fingerfuchs.png"],
+      Kaffee: ["toGoCup.svg"]
     };
 
+    this.transformingFactorX = 0.3;
+    this.transformingFactorY = 0.5;
     return {
       msg: "Konfigurator",
       images: [],
@@ -103,6 +107,13 @@ export default {
 
   methods: {
     changeCategory() {
+
+      
+
+      for (var m in this.clickedAdd) {
+        this.clickedAdd[image].className = "element";
+      }
+
       this.dropdown = [];
       var newImages = this.categories[this.selected];
       for (var m in newImages) {
@@ -114,14 +125,14 @@ export default {
     },
     mark() {
       if (event.target.classList.contains("elementMarked")) {
-        var index = this.clickedAdd.indexOf(event.target.id);
+        var index = this.clickedAdd.indexOf(event.target);
         if (index > -1) {
-          this.clickedAdd.splice(index, 1);
+          this.clickedAdd.splice(event.target, 1);
         }
         event.target.className = "element";
       } else {
         event.target.className += " elementMarked";
-        this.clickedAdd.push(event.target.id);
+        this.clickedAdd.push(event.target);
       }
     },
 
@@ -141,53 +152,51 @@ export default {
       }
     },
 
-    addImageToCanvas() {
-      var canvas = document.getElementById("canvas");
-      var img = event.target;
-      var coordinates = this.calculateCoordinates(canvas, img, 0.3);
-      this.leftPos = coordinates.x;
-      this.topPos = coordinates.y;
-
-      var imageId = this.imageCounter++;
-
-      this.images.push({
-        id: imageId,
-        url: event.target.src,
-        width: coordinates.width,
-        height: coordinates.height
-      });
+    addSingleImageToCanvas() {
+      this.clickedAdd.push(event.target);
+      this.addAll();
     },
 
     addAll() {
+      
       for (var image in this.clickedAdd) {
-        var src = "/static/" + this.clickedAdd[image];
+        var src = (this.clickedAdd[image].src).replace("http://localhost:8080","");
         var canvas = document.getElementById("canvas");
-        var img = document.createElement("img");
-        var coordinates = this.calculateCoordinates(canvas, img, 0.3);
-
-        this.left = coordinates[0];
-        this.top = coordinates[1];
+        var coordinates = this.calculateCoordinates(canvas, this.clickedAdd[image]);
+        
+        this.leftPos = coordinates.x;
+        this.topPos = coordinates.y;
 
         this.images.push({
           id: this.imageCounter++,
           url: src,
-          width: coordinates[2],
-          height: coordinates[3]
+          width: coordinates.width,
+          height: coordinates.height
         });
 
-        // alert(document.getElementById(this.clickedAdd[image]).className);
-        //document.getElementById(this.clickedAdd[image]).className="element";
+        this.clickedAdd[image].className="element";
       }
 
       this.clickedAdd = [];
     },
 
-    calculateCoordinates(canvas, image, transformFactor) {
-      var newImageHeight = canvas.clientHeight * transformFactor; // 256
-      var newImageWidth = newImageHeight / image.naturalHeight * image.naturalWidth; // 195
-      var x = canvas.offsetLeft + (canvas.clientWidth - newImageWidth) / 2; //90
-      var y = canvas.offsetTop + (canvas.clientHeight - newImageHeight) / 2; //140
-      return {
+    calculateCoordinates(canvas, image) {
+      var naturalImageWidth = image.naturalWidth;
+      var naturalImageHeight = image.naturalHeight;
+      var newImageHeight = 0;
+       var newImageWidth = 0;
+      if(naturalImageWidth > naturalImageHeight){
+        newImageHeight = canvas.clientHeight * this.transformingFactorX; 
+        newImageWidth = newImageHeight / naturalImageHeight * naturalImageWidth; 
+      } else {
+        newImageHeight = canvas.clientHeight * this.transformingFactorY; 
+        newImageWidth = newImageHeight / naturalImageHeight * naturalImageWidth; 
+      }
+
+      var x = canvas.offsetLeft + (canvas.clientWidth - newImageWidth) / 2; 
+        var y = canvas.offsetTop + (canvas.clientHeight - newImageHeight) / 2; 
+     
+            return {
         x: x,
         y: y,
         width: newImageWidth,
@@ -350,6 +359,16 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+
+.icon {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  stroke-width: 0;
+  stroke: currentColor;
+  fill: currentColor;
+}
+
 .element:hover {
   opacity: 0.85;
 }
@@ -360,7 +379,7 @@ export default {
 }
 
 .elementRemoved {
-  opacity: 0.85;
+  opacity: 0.5;
 }
 
 .elementNotRemoved {
@@ -369,19 +388,23 @@ export default {
 
 button {
   background-color: rgba(41, 56, 80, 1);
-  /*margin-left: auto;
-  margin-right: auto; */
-  /* color: white; */
   padding: 0px;
-  /*font-size: 10px;*/
   width: 23%;
   color: white;
-  background-size: 40%;
+  background-size: 20%;
   background-repeat: no-repeat;
   background-position: center;
 }
 
-/* #addButton {
+button:hover {
+    /*color: white; */
+}
+
+button:focus {
+    color: white;
+}
+
+ #addButton {
   background-image: url("/static/hinzufuegen-button.png");
 }
 
@@ -391,10 +414,15 @@ button {
 
 #deleteButton {
   background-image: url("/static/delete-button.png");
-} */
+} 
 
 .resize-drag {
   position: absolute;
+}
+
+.resize-drag:hover {
+  opacity: 0.5;
+  border: black dashed 0.5px;
 }
 
 #categories {

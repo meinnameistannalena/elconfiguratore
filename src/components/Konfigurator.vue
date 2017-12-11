@@ -6,7 +6,7 @@
      <link rel="stylesheet" href="/static/normalize.css">
 
     <h1 style="text-align: center">EL CONFIGURATORE</h1>
-   
+
     <div class="container">
 
         <div class="row">
@@ -17,7 +17,7 @@
 
 
           <div id="elementsOfChoice" class="four columns" >
-            
+
             <img v-for="(value, key, index) in this.dropdown" :key="index" :id="value.id" :src="value.url" class="element" @dblclick="addSingleImageToCanvas()" @click="mark()">
           </div>
 
@@ -41,17 +41,17 @@
             </option>
           </select>
           </div>
-      
+
       </div>
-      
+
     </div>
 
   </div>
-       
-      
+
+
 </template>
 
- 
+
 
 <script>
 import interact from "interact.js";
@@ -69,11 +69,20 @@ export default {
     this.imageCounter = 0;
     this.dropdown = [];
 
-    this.categoryList = ["Galaxy", "Unicorn ","Kaffee", "Sonstiges"];
+    this.categoryList = ["Galaxy", "Unicorn ", "Kaffee", "Sonstiges"];
 
     this.categories = {
-      Galaxy: ["galaxy001.png", "galaxy002.png", "galaxy003.png", "galaxy004.png","galaxy005.png", "galaxy006.png", "galaxy007.png", "galaxy008.png"],
-      Unicorn: ["unicorn001.png",  "unicorn003.png","unicorn002.png"],
+      Galaxy: [
+        "galaxy001.png",
+        "galaxy002.png",
+        "galaxy003.png",
+        "galaxy004.png",
+        "galaxy005.png",
+        "galaxy006.png",
+        "galaxy007.png",
+        "galaxy008.png"
+      ],
+      Unicorn: ["unicorn001.png", "unicorn003.png", "unicorn002.png"],
       Sonstiges: ["fingerfuchs.png"],
       Kaffee: ["toGoCup.svg"]
     };
@@ -155,12 +164,17 @@ export default {
     },
 
     addAll() {
-      
       for (var image in this.clickedAdd) {
-        var src = (this.clickedAdd[image].src).replace("http://localhost:8080","");
+        var src = this.clickedAdd[image].src.replace(
+          "http://localhost:8080",
+          ""
+        );
         var canvas = document.getElementById("canvas");
-        var coordinates = this.calculateCoordinates(canvas, this.clickedAdd[image]);
-        
+        var coordinates = this.calculateCoordinates(
+          canvas,
+          this.clickedAdd[image]
+        );
+
         this.leftPos = coordinates.x;
         this.topPos = coordinates.y;
 
@@ -171,7 +185,7 @@ export default {
           height: coordinates.height
         });
 
-        this.clickedAdd[image].className="element";
+        this.clickedAdd[image].className = "element";
       }
 
       this.clickedAdd = [];
@@ -181,24 +195,24 @@ export default {
       var naturalImageWidth = image.naturalWidth;
       var naturalImageHeight = image.naturalHeight;
       var newImageHeight = 0;
-       var newImageWidth = 0;
-      if(naturalImageWidth > naturalImageHeight){
-        newImageHeight = canvas.clientHeight * this.transformingFactorX; 
-        newImageWidth = newImageHeight / naturalImageHeight * naturalImageWidth; 
+      var newImageWidth = 0;
+      if (naturalImageWidth > naturalImageHeight) {
+        newImageHeight = canvas.clientHeight * this.transformingFactorX;
+        newImageWidth = newImageHeight / naturalImageHeight * naturalImageWidth;
       } else {
-        newImageHeight = canvas.clientHeight * this.transformingFactorY; 
-        newImageWidth = newImageHeight / naturalImageHeight * naturalImageWidth; 
+        newImageHeight = canvas.clientHeight * this.transformingFactorY;
+        newImageWidth = newImageHeight / naturalImageHeight * naturalImageWidth;
       }
 
-      var x = canvas.offsetLeft + (canvas.clientWidth - newImageWidth) / 2; 
-        var y = canvas.offsetTop + (canvas.clientHeight - newImageHeight) / 2; 
-     
-            return {
+      var x = canvas.offsetLeft + (canvas.clientWidth - newImageWidth) / 2;
+      var y = canvas.offsetTop + (canvas.clientHeight - newImageHeight) / 2;
+
+      return {
         x: x,
         y: y,
         width: newImageWidth,
         height: newImageHeight
-      }
+      };
     },
 
     reset() {
@@ -356,7 +370,6 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-
 .icon {
   display: inline-block;
   width: 1em;
@@ -394,14 +407,14 @@ button {
 }
 
 button:hover {
-    /*color: white; */
+  /*color: white; */
 }
 
 button:focus {
-    color: white;
+  color: white;
 }
 
- #addButton {
+#addButton {
   background-image: url("/static/hinzufuegen-button.png");
 }
 
@@ -411,7 +424,7 @@ button:focus {
 
 #deleteButton {
   background-image: url("/static/delete-button.png");
-} 
+}
 
 .resize-drag {
   position: absolute;
@@ -465,7 +478,7 @@ button:focus {
 .element {
   height: 60px;
   margin-top: 9px;
-  margin-right: 5px; 
+  margin-right: 5px;
 }
 
 #logo {
@@ -509,7 +522,7 @@ button:focus {
   .element {
     height: 85px;
     margin-top: 8px;
-    margin-right: 6px; 
+    margin-right: 6px;
   }
   .buttons {
     width: 315px;
@@ -553,7 +566,7 @@ button:focus {
   .element {
     height: 90px;
     margin-top: 9px;
-    margin-right: 7px;     
+    margin-right: 7px;
   }
   .buttons {
     width: 430px;

@@ -1,9 +1,6 @@
 <template>
 
   <div id="hello" class="row">
-    <link rel="stylesheet" href="/static/stylesheet.css">
-    <link rel="stylesheet" href="/static/skeleton.css">
-     <link rel="stylesheet" href="/static/normalize.css">
 
     <h1 style="text-align: center">EL CONFIGURATORE</h1>
 
@@ -12,7 +9,6 @@
         <div class="row">
           <div id="canvas" class="eight columns">
              <img :style="backgroundStyle" v-for="(value, key, index) in images" :key="index" :id="value.id" :src="value.url" :width="value.wixdth" :height="value.height" class="resize-drag" @dblclick="removeImageByDoubleClick()">
-           <!-- <img id="logo" src="/static/fingerfuchsLogo.png" alt="Selfhtml"> -->
           </div>
 
 
@@ -54,9 +50,10 @@
 
 
 <script>
+import "../../static/normalize.css";
+import "../../static/skeleton.css";
+
 import interact from "interact.js";
-import jquery from "jquery";
-import skeleton from "npm-skeleton";
 import html2canvas from "html2canvas";
 import jspdf from "jspdf";
 

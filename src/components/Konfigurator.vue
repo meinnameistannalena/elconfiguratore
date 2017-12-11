@@ -8,13 +8,14 @@
 
         <div class="row">
           <div id="canvas" class="eight columns">
-             <img :style="backgroundStyle" v-for="(value, key, index) in images" :key="index" :id="value.id" :src="value.url" :width="value.wixdth" :height="value.height" class="resize-drag" @dblclick="removeImageByDoubleClick()">
+             <img :style="backgroundStyle" v-for="(value, key, index) in images" :key="index" :id="value.id" :src="value.url" :width="value.wixdth" :height="value.height" class="resize-drag" @dblclick="removeImageByDoubleClick">
           </div>
 
 
           <div id="elementsOfChoice" class="four columns" >
-
-            <img v-for="(value, key, index) in this.dropdown" :key="index" :id="value.id" :src="value.url" class="element" @dblclick="addSingleImageToCanvas()" @click="mark()">
+            <img v-for="(value, key, index) in this.dropdown"
+            :key="index" :id="value.id" :src="value.url" class="element"
+            @dblclick="addSingleImageToCanvas" @click="mark">
           </div>
 
       </div>
@@ -22,10 +23,10 @@
        <div class="row">
 
           <div id="allButtons" class="eight columns">
-            <button id="addButton" class="fontButton" @click="addAll()">&nbsp;</button>
-            <button id="deleteButton" class="imageButton" @click="deleteImages()">&nbsp;</button>
-            <button id="resetButton" class="imageButton" @click="reset()">&nbsp;</button>
-             <button id="pdfButton" class="fontButton" @click="createPDF()">Download</button>
+            <button id="addButton" class="fontButton" @click="addAll">&nbsp;</button>
+            <button id="deleteButton" class="imageButton" @click="deleteImages">&nbsp;</button>
+            <button id="resetButton" class="imageButton" @click="reset">&nbsp;</button>
+            <button id="pdfButton" class="fontButton" @click="createPDF">Download</button>
 
           </div>
 
@@ -126,7 +127,7 @@ export default {
         });
       }
     },
-    mark() {
+    mark(event) {
       if (event.target.classList.contains("elementMarked")) {
         var index = this.clickedAdd.indexOf(event.target);
         if (index > -1) {
@@ -155,7 +156,7 @@ export default {
       }
     },
 
-    addSingleImageToCanvas() {
+    addSingleImageToCanvas(event) {
       this.clickedAdd.push(event.target);
       this.addAll();
     },
@@ -247,7 +248,7 @@ export default {
       this.clickedRemove = [];
     },
 
-    removeImageByDoubleClick() {
+    removeImageByDoubleClick(event) {
       for (var i = 0; i < this.images.length; i++) {
         if (this.images[i].id == event.target.id) {
           this.images.splice(i, 1);

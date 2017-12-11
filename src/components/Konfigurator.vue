@@ -7,17 +7,10 @@
     <div class="container">
 
       <div class="row">
-        <div id="canvas" class="eight columns">
-          <img :style="backgroundStyle" v-for="(value, key, index) in images" :key="index" :id="value.id"
-               :src="value.url" :width="value.wixdth" :height="value.height" class="resize-drag"
-               @dblclick="removeImageByDoubleClick">
-        </div>
-
+        <Leinwand :images="images"/>
 
         <div id="elementsOfChoice" class="four columns">
-          <img v-for="(value, key, index) in this.dropdown"
-               :key="index" :id="value.id" :src="value.url" class="element"
-               @dblclick="addSingleImageToCanvas" @click="mark">
+          <Bildauswahl :categories="categories" v-on:selection="onImageSelection"/>
         </div>
 
       </div>
@@ -30,15 +23,6 @@
           <button id="resetButton" class="imageButton" @click="reset">&nbsp;</button>
           <button id="pdfButton" class="fontButton" @click="createPDF">Download</button>
 
-        </div>
-
-
-        <div id="categories" class="four columns">
-          <select v-on:change="changeCategory()" v-model="selected" id="category">
-            <option v-for="category in categoryList">
-              {{ category }}
-            </option>
-          </select>
         </div>
 
       </div>
@@ -55,12 +39,19 @@
   import "../../static/normalize.css";
   import "../../static/skeleton.css";
 
+  import Leinwand from "./Leinwand";
+  import Bildauswahl from "./Bildauswahl";
+
   import interact from "interact.js";
   import html2canvas from "html2canvas";
   import jspdf from "jspdf";
 
   export default {
     name: "Konfigurator",
+    components: {
+      Leinwand,
+      Bildauswahl
+    },
 
     data() {
       this.clickedAdd = [];
@@ -68,79 +59,34 @@
       this.imageCounter = 0;
       this.dropdown = [];
 
-      this.categoryList = ["Galaxy", "Unicorn ", "Kaffee", "Sonstiges"];
-
-      this.categories = {
-        Galaxy: [
-          "galaxy001.png",
-          "galaxy002.png",
-          "galaxy003.png",
-          "galaxy004.png",
-          "galaxy005.png",
-          "galaxy006.png",
-          "galaxy007.png",
-          "galaxy008.png"
-        ],
-        Unicorn: ["unicorn001.png", "unicorn003.png", "unicorn002.png"],
-        Sonstiges: ["fingerfuchs.png"],
-        Kaffee: ["toGoCup.svg"]
-      };
 
       this.transformingFactorX = 0.3;
       this.transformingFactorY = 0.5;
       return {
-        msg: "Konfigurator",
         images: [],
-
-        selected: "Galaxy",
-        pic_url:
-          "http://coolwildlife.com/wp-content/uploads/galleries/post-3004/Fox%20Picture%20003.jpg",
-        leftPos: "0px",
-        topPos: "0px",
-        classObject: {
-          active: true,
-          "text-danger": false
+        categories: {
+          Galaxy: [
+            "galaxy001.png",
+            "galaxy002.png",
+            "galaxy003.png",
+            "galaxy004.png",
+            "galaxy005.png",
+            "galaxy006.png",
+            "galaxy007.png",
+            "galaxy008.png"
+          ],
+          Unicorn: ["unicorn001.png", "unicorn003.png", "unicorn002.png"],
+          Sonstiges: ["fingerfuchs.png"],
+          Kaffee: ["toGoCup.svg"]
         }
       };
     },
 
-    computed: {
-      backgroundStyle: function () {
-        return {
-          left: this.leftPos + "px",
-          top: this.topPos + "px"
-        };
-      }
-    },
 
     methods: {
-      changeCategory() {
-        for (var m in this.clickedAdd) {
-          this.clickedAdd[image].className = "element";
-        }
-
-        this.dropdown = [];
-        var newImages = this.categories[this.selected];
-        for (var m in newImages) {
-          this.dropdown.push({
-            id: newImages[m],
-            url: "/static/" + newImages[m]
-          });
-        }
+      onImageSelection(image) {
+        console.log("image got selected", image);
       },
-      mark(event) {
-        if (event.target.classList.contains("elementMarked")) {
-          var index = this.clickedAdd.indexOf(event.target);
-          if (index > -1) {
-            this.clickedAdd.splice(event.target, 1);
-          }
-          event.target.className = "element";
-        } else {
-          event.target.className += " elementMarked";
-          this.clickedAdd.push(event.target);
-        }
-      },
-
       markDeleted() {
         if (event.target.classList.contains("elementRemoved")) {
           var index = this.clickedRemove.indexOf(event.target.id);

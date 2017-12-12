@@ -72,14 +72,9 @@
 
 
     methods: {
-      onImageSelection(event) {
-        console.log("image got selected", event.target);
-        this.images.push({
-          url: event.target.getAttribute("src"),
-          id: "abc",
-          width: 200,
-          height: 200
-        })
+      onImageSelection(image) {
+        console.log("image got selected", image);
+        this.images.push(image);
       },
       markDeleted() {
         if (event.target.classList.contains("elementRemoved")) {

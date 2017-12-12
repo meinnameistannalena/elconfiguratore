@@ -1,7 +1,7 @@
 <template>
   <div id="canvas" class="eight columns">
-    <img v-for="(value, key, index) in images" :key="index" :id="value.id"
-         :src="value.url" :width="value.width" :height="value.height" class="resize-drag"
+    <img v-for="(value, key, index) in images" :key="index"
+         :src="value.src" :width="value.width" :height="value.height" class="resize-drag"
          >
   </div>
 </template>

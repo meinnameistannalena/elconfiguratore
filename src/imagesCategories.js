@@ -1,15 +1,25 @@
+import Image from "./models/Image";
+
 export default {
   Galaxy: [
-    "galaxy001.png",
-    "galaxy002.png",
-    "galaxy003.png",
-    "galaxy004.png",
-    "galaxy005.png",
-    "galaxy006.png",
-    "galaxy007.png",
-    "galaxy008.png"
+    new Image("galaxy001.png"),
+    new Image("galaxy002.png"),
+    new Image("galaxy003.png"),
+    new Image("galaxy004.png"),
+    new Image("galaxy005.png"),
+    new Image("galaxy006.png"),
+    new Image("galaxy007.png"),
+    new Image("galaxy008.png"),
   ],
-  Unicorn: ["unicorn001.png", "unicorn003.png", "unicorn002.png"],
-  Sonstiges: ["fingerfuchs.png"],
-  Kaffee: ["toGoCup.svg"]
+  Kaffee: [
+    new Image("toGoCup.svg"),
+  ],
+  Unicorn: [
+    new Image("unicorn001.png"),
+    new Image("unicorn002.png"),
+    new Image("unicorn003.png"),
+  ],
+  Sonstiges: [
+    new Image("fingerfuchs.png"),
+  ],
 };

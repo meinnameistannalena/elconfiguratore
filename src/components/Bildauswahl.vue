@@ -6,8 +6,8 @@
       </option>
     </select>
     <ul>
-      <li v-for="(value, key, index) in categories[selected]">
-        <img :key="index" :src="'/static/' + value" class="selectable" @dblclick="emitImageSelection">
+      <li v-for="(image, key, index) in categories[selected]">
+        <img :key="index" :src="image.src" class="selectable" @dblclick="emitImageSelection(image)">
       </li>
     </ul>
   </div>
@@ -24,8 +24,8 @@
       }
     },
     methods: {
-      emitImageSelection(event) {
-        this.$emit("selection", event);
+      emitImageSelection(image) {
+        this.$emit("selection", image);
       }
     }
   }

@@ -39,6 +39,8 @@
   import "../../static/normalize.css";
   import "../../static/skeleton.css";
 
+  import imagesCategorised from "../imagesCategories";
+
   import Leinwand from "./Leinwand";
   import Bildauswahl from "./Bildauswahl";
 
@@ -64,28 +66,20 @@
       this.transformingFactorY = 0.5;
       return {
         images: [],
-        categories: {
-          Galaxy: [
-            "galaxy001.png",
-            "galaxy002.png",
-            "galaxy003.png",
-            "galaxy004.png",
-            "galaxy005.png",
-            "galaxy006.png",
-            "galaxy007.png",
-            "galaxy008.png"
-          ],
-          Unicorn: ["unicorn001.png", "unicorn003.png", "unicorn002.png"],
-          Sonstiges: ["fingerfuchs.png"],
-          Kaffee: ["toGoCup.svg"]
-        }
+        categories: imagesCategorised
       };
     },
 
 
     methods: {
-      onImageSelection(image) {
-        console.log("image got selected", image);
+      onImageSelection(event) {
+        console.log("image got selected", event.target);
+        this.images.push({
+          url: event.target.getAttribute("src"),
+          id: "abc",
+          width: 200,
+          height: 200
+        })
       },
       markDeleted() {
         if (event.target.classList.contains("elementRemoved")) {
@@ -101,11 +95,6 @@
           event.target.className += " elementRemoved";
           this.clickedRemove.push(event.target.id);
         }
-      },
-
-      addSingleImageToCanvas(event) {
-        this.clickedAdd.push(event.target);
-        this.addAll();
       },
 
       addAll() {

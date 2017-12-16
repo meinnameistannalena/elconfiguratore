@@ -8,28 +8,24 @@
 
       <div class="row">
         <div id="canvas" class="eight columns">
-          <img :style="backgroundStyle" v-for="(value, key, index) in images" :key="index" :id="value.id"
-               :src="value.url" :width="value.wixdth" :height="value.height" class="resize-drag"
+          <img v-for="(value, key, index) in images" :key="index" :id="value.id"
+               :src="value.url" :width="value.width" :height="value.height" v-bind:style="{ left: value.left + 'px', top: value.top + 'px' }" class="resize-drag"
                @dblclick="removeImageByDoubleClick">
         </div>
-
 
         <div id="elementsOfChoice" class="four columns">
           <img v-for="(value, key, index) in this.dropdown"
                :key="index" :id="value.id" :src="value.url" :class="value.marked ? 'element elementMarked' : 'element'"
                @dblclick="addSingleImageToCanvas" @click="mark">
         </div>
-
       </div>
 
       <div class="row">
-
         <div id="allButtons" class="eight columns">
           <button id="addButton" class="buttonSmall" @click="addAll">&nbsp;</button>
           <button id="deleteButton" class="buttonSmall" @click="deleteImages">&nbsp;</button>
           <button id="resetButton" class="buttonSmall" @click="reset">&nbsp;</button>
           <button id="pdfButton" class="buttonBig" @click="createPDF">Download</button>
-
         </div>
 
 
@@ -92,26 +88,11 @@ export default {
       msg: "Konfigurator",
       images: [],
 
-      selected: "Galaxy",
-      pic_url:
-        "http://coolwildlife.com/wp-content/uploads/galleries/post-3004/Fox%20Picture%20003.jpg",
-      leftPos: "0px",
-      topPos: "0px",
-      classObject: {
-        active: true,
-        "text-danger": false
-      }
+      selected: "Galaxy"
     };
   },
 
-  computed: {
-    backgroundStyle: function() {
-      return {
-        left: this.leftPos + "px",
-        top: this.topPos + "px"
-      };
-    }
-  },
+  computed: {},
 
   methods: {
     changeCategory() {
@@ -209,14 +190,13 @@ export default {
           this.clickedAdd[image].height
         );
 
-        this.leftPos = coordinates.x;
-        this.topPos = coordinates.y;
-
         this.images.push({
           id: this.imageCounter++,
           url: src,
           width: coordinates.width,
-          height: coordinates.height
+          height: coordinates.height,
+          left: coordinates.x,
+          top: coordinates.y
         });
       }
       this.clickedAdd = [];
@@ -420,7 +400,6 @@ export default {
 
 .elementMarked {
   opacity: 0.5;
-  /*background: rgba(41, 56, 80, .5);*/
 }
 
 .elementRemoved {

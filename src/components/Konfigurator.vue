@@ -7,10 +7,10 @@
     <div class="container">
 
       <div class="row">
-        <Leinwand :images="images" v-on:removeImage="onRemoveImage"/>
+        <Leinwand :images="images" v-on:removeImage="onRemoveImage" v-on:selectImage="onSelectImage"/>
 
         <div id="elementsOfChoice" class="four columns">
-          <Bildauswahl :categories="categories" v-on:selection="onImageSelection"/>
+          <Bildauswahl :categories="categories" v-on:selection="onAddImage"/>
         </div>
 
       </div>
@@ -19,7 +19,7 @@
 
         <div id="allButtons" class="eight columns">
           <button id="addButton" class="fontButton">&nbsp;</button>
-          <button id="deleteButton" class="imageButton" @click="deleteImages">&nbsp;</button>
+          <button id="deleteButton" class="imageButton" @click="triggerRemoveImage">&nbsp;</button>
           <button id="resetButton" class="imageButton" @click="reset">&nbsp;</button>
           <button id="pdfButton" class="fontButton" @click="createPDF">Download</button>
 
@@ -56,42 +56,25 @@ export default {
   },
 
   data() {
-    this.clickedAdd = [];
-    this.clickedRemove = [];
-    this.imageCounter = 0;
-    this.dropdown = [];
-
     this.transformingFactorX = 0.3;
     this.transformingFactorY = 0.5;
     return {
       images: [],
-      categories: imagesCategorised
+      categories: imagesCategorised,
+      currentSelection: null
     };
   },
 
   methods: {
-    onImageSelection(image) {
-      console.log("image got selected", image);
+    onAddImage(image) {
       this.images.push(image);
     },
     onRemoveImage(index) {
-      // einfach nur this.images[index] = null funktioniert nicht, wegen: https://vuejs.org/v2/guide/list.html#Caveats
-      Vue.set(this.images, index, null);
+      this.removeImage(index);
     },
-    markDeleted() {
-      if (event.target.classList.contains("elementRemoved")) {
-        var index = this.clickedRemove.indexOf(event.target.id);
-        if (index > -1) {
-          this.clickedRemove.splice(index, 1);
-        }
-        event.target.className = event.target.className.replace(
-          "elementRemoved",
-          ""
-        );
-      } else {
-        event.target.className += " elementRemoved";
-        this.clickedRemove.push(event.target.id);
-      }
+    onSelectImage(index) {
+      this.currentSelection = index;
+      console.log("selected image", this.currentSelection);
     },
 
     calculateCoordinates(canvas, image) {
@@ -122,31 +105,15 @@ export default {
       this.images = [];
     },
 
-    removeImage(canvas, imageType) {
-      if (imageType == 0) {
-        if (this.canvasImages.length > 0) {
-          var child = document.getElementById(this.canvasImages[0]);
-          canvas.removeChild(child);
-          this.canvasImages.pop();
-        }
-      } else {
-        if (this.canvasBackground.length > 0) {
-          var child = document.getElementById(this.canvasBackground[0]);
-          canvas.removeChild(child);
-          this.canvasBackground.pop();
-        }
-      }
+    removeImage(index) {
+      // einfach nur this.images[index] = null funktioniert nicht, wegen: https://vuejs.org/v2/guide/list.html#Caveats
+      Vue.set(this.images, index, null);
     },
 
-    deleteImages() {
-      for (var t in this.clickedRemove) {
-        for (var i = 0; i < this.images.length; i++) {
-          if (this.images[i].id == this.clickedRemove[t]) {
-            this.images.splice(i, 1);
-          }
-        }
+    triggerRemoveImage() {
+      if (this.currentSelection !== null) {
+        this.removeImage(this.currentSelection);
       }
-      this.clickedRemove = [];
     },
 
     createPDF() {
@@ -173,15 +140,6 @@ export default {
       canvas.style.border = "1px solid black";
     }
   },
-  created() {
-    var defaultCategory = this.categories["Galaxy"];
-    for (var m in defaultCategory) {
-      this.dropdown.push({
-        id: defaultCategory[m],
-        url: "/static/" + defaultCategory[m]
-      });
-    }
-  }
 };
 </script>
 

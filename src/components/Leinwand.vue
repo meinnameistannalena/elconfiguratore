@@ -2,7 +2,7 @@
   <div id="canvas" class="eight columns">
     <img v-for="(value, index) in images" v-if="value !== null" :key="index"
          :src="value.src" :width="value.width" :height="value.height"
-         class="resize-drag" @dblclick="removeImage(index)"
+         class="resize-drag" @click="selectImage(index)" @dblclick="removeImage(index)"
          >
   </div>
 </template>
@@ -88,6 +88,9 @@ export default {
   methods: {
     removeImage(index) {
       this.$emit("removeImage", index);
+    },
+    selectImage(index) {
+      this.$emit("selectImage", index);
     }
   }
 };

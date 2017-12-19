@@ -13,14 +13,13 @@ import interact from "interact.js";
 export default {
   name: "Leinwand",
   props: ["images", "message"],
-  
+
   data: () => {
-    
     return {
       clickedRemove: [],
       imageCounter: 0
-    }
-  }, 
+    };
+  },
 
   created() {
     // target elements with the "draggable" class
@@ -73,7 +72,7 @@ export default {
         target.setAttribute("data-x", x);
         target.setAttribute("data-y", y);
         target.textContent =
-            Math.round(event.rect.width) + "×" + Math.round(event.rect.height);
+          Math.round(event.rect.width) + "×" + Math.round(event.rect.height);
       })
       .on("tap", this.selectImage.bind(this));
 
@@ -101,7 +100,7 @@ export default {
     },
 
     selectImage(event) {
-       if (event.target.classList.contains("elementRemoved")) {
+      if (event.target.classList.contains("elementRemoved")) {
         event.target.className = event.target.className.replace(
           "elementRemoved",
           ""
@@ -117,11 +116,11 @@ export default {
 </script>
 
 <style scoped>
-  img {
-    position: absolute;
-  }
+img {
+  position: absolute;
+}
 
-  .resize-drag {
+.resize-drag {
   position: absolute;
 }
 
@@ -137,5 +136,4 @@ export default {
 .elementNotRemoved {
   opacity: 1;
 }
-
 </style>

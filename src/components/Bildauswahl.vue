@@ -20,30 +20,27 @@ import imagesCategorised from "../imagesCategories";
 
 export default {
   name: "Bildauswahl",
-  props: ["categories", "clickedAdd"],
+  props: ["categories", "clickedAdd", "imageToAddExists"],
   data: () => {
     return {
       selected: "Galaxy",
-      dropdown: [],
-      categoryList: ["Galaxy", "Unicorn", "Cof"]
+      dropdown: []
     };
   },
   methods: {
     emitImageSelection(event) {
-      //alert(event.target);
       this.$emit("selection", event);
     },
     emitImageMarked(event) {
       this.$emit("imageMarked");
     },
     changeCategory(categories, clickedAdd) {
-      alert(clickedAdd);
       var selection = categories[this.selected];
       for (var i in selection) {
         for (var add in clickedAdd) {
           var id = this.clickedAdd[add].id;
           if (selection[i].src == id) {
-             selection[i].marked = true;
+            selection[i].marked = true;
           }
         }
       }

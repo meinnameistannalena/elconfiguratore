@@ -62,11 +62,14 @@ export default {
 
     this.imageCounter = 0;
 
+    this.imageToAddExists = false;
+
     return {
       images: [],
       categories: imagesCategorised,
       currentSelection: null,
-      clickedAdd: []
+      clickedAdd: [],
+      imageToAddExists: false
     };
   },
 
@@ -93,12 +96,14 @@ export default {
         });
       }
       this.clickedAdd = [];
-      for (var d in imagesCategorised) {
-        var selection = imagesCategorised[d];
+
+      for (var d in this.categories) {
+        var selection = this.categories[d];
         for (var image in selection) {
           selection[image].marked = false;
         }
       }
+      //this.categories = imagesCategorised;
     },
 
     onAddImage(event) {
@@ -178,8 +183,14 @@ export default {
 
     createPDF() {
       var canvas = document.getElementById("canvas");
+      var images = canvas.childNodes;
+      for (var i in images) {
+        if (images[i] instanceof HTMLImageElement) {
+          images[i].className = "selectable";
+        }
+      }
+
       canvas.style.border = "none";
-      //var clone = div.cloneNode(true); // true means clone all childNodes and all event handlers
 
       html2canvas(canvas, {
         scale: 2,
@@ -220,9 +231,6 @@ export default {
           height: event.target.naturalHeight
         });
       }
-    },
-    markDeleted() {
-      //alert(event.target.classList);
     }
   }
 };

@@ -7,34 +7,20 @@
     <div class="container">
 
       <div class="row">
-        <div id="canvas" class="eight columns">
-          <img v-for="(value, key, index) in images" :key="index" :id="value.id"
-               :src="value.url" :width="value.width" :height="value.height" v-bind:style="{ left: value.left + 'px', top: value.top + 'px' }" class="resize-drag"
-               @dblclick="removeImageByDoubleClick">
-        </div>
+    
+        <Leinwand :images="images" v-on:removeImage="onRemoveImage" v-on:selectImage="onSelectImage"/>
 
         <div id="elementsOfChoice" class="four columns">
-          <img v-for="(value, key, index) in this.dropdown"
-               :key="index" :id="value.id" :src="value.url" :class="value.marked ? 'element elementMarked' : 'element'"
-               @dblclick="addSingleImageToCanvas" @click="mark">
+          <Bildauswahl :categories="categories" :clickedAdd="clickedAdd" v-on:selection="onAddImage" v-on:imageMarked="mark"/>
         </div>
       </div>
 
       <div class="row">
         <div id="allButtons" class="eight columns">
           <button id="addButton" class="buttonSmall" @click="addAll">&nbsp;</button>
-          <button id="deleteButton" class="buttonSmall" @click="deleteImages">&nbsp;</button>
+          <button id="deleteButton" class="buttonSmall" @click="triggerRemoveImage">&nbsp;</button>
           <button id="resetButton" class="buttonSmall" @click="reset">&nbsp;</button>
           <button id="pdfButton" class="buttonBig" @click="createPDF">Download</button>
-        </div>
-
-
-        <div id="categories" class="four columns">
-          <select v-on:change="changeCategory()" v-model="selected" id="category">
-            <option v-for="category in categoryList">
-              {{ category }}
-            </option>
-          </select>
         </div>
 
       </div>
@@ -51,132 +37,40 @@
 import "../../static/normalize.css";
 import "../../static/skeleton.css";
 
-import interact from "interact.js";
+import Vue from "vue";
+import imagesCategorised from "../imagesCategories";
+
+import Leinwand from "./Leinwand";
+import Bildauswahl from "./Bildauswahl";
+
 import html2canvas from "html2canvas";
 import jspdf from "jspdf";
 
 export default {
   name: "Konfigurator",
+  components: {
+    Leinwand,
+    Bildauswahl
+  },
 
   data() {
     this.clickedAdd = [];
-    this.clickedRemove = [];
+    this.clickedToRemove = [];
+
+    this.transformingFactorX = 0.3;
+    this.transformingFactorY = 0.5;
+
     this.imageCounter = 0;
-    this.dropdown = [];
 
-    this.categoryList = ["Galaxy", "Unicorn ", "Kaffee", "Sonstiges"];
-
-    this.categories = {
-      Galaxy: [
-        "galaxy001.png",
-        "galaxy002.png",
-        "galaxy003.png",
-        "galaxy004.png",
-        "galaxy005.png",
-        "galaxy006.png",
-        "galaxy007.png",
-        "galaxy008.png"
-      ],
-      Unicorn: ["unicorn001.png", "unicorn003.png", "unicorn002.png"],
-      Sonstiges: ["fingerfuchs.png"],
-      Kaffee: ["toGoCup.svg"]
-    };
-
-    this.transformingFactorX = 0.2;
-    this.transformingFactorY = 0.4;
     return {
-      msg: "Konfigurator",
       images: [],
-
-      selected: "Galaxy"
+      categories: imagesCategorised,
+      currentSelection: null,
+      clickedAdd: []
     };
   },
 
-  computed: {},
-
   methods: {
-    changeCategory() {
-      var str = "";
-      for (var image in this.clickedAdd) {
-        str = str + this.clickedAdd[image].id;
-      }
-
-      for (var m in this.dropdown) {
-        var id = this.dropdown[m].id;
-        document.getElementById(id).className = "element";
-      }
-
-      this.dropdown = [];
-      var newImages = this.categories[this.selected];
-
-      var isMarked = false;
-      for (var m in newImages) {
-        isMarked = false;
-        for (var add in this.clickedAdd) {
-          var id = this.clickedAdd[add].id;
-          if (newImages[m] == id) {
-            isMarked = true;
-          }
-        }
-
-        this.dropdown.push({
-          id: newImages[m],
-          url: "/static/" + newImages[m],
-          marked: isMarked
-        });
-      }
-    },
-
-    mark(event) {
-      if (event.target.classList.contains("elementMarked")) {
-        for (var image in this.clickedAdd) {
-          var id = this.clickedAdd[image].id;
-          if (id == event.target.id) {
-            var index = this.clickedAdd.indexOf(this.clickedAdd[image]);
-            if (index > -1) {
-              this.clickedAdd.splice(index, 1);
-            }
-            document.getElementById(id).className = "element";
-          }
-        }
-      } else {
-        event.target.className += " elementMarked";
-
-        this.clickedAdd.push({
-          id: event.target.id,
-          url: event.target.src,
-          width: event.target.naturalWidth,
-          height: event.target.naturalHeight
-        });
-      }
-    },
-
-    markDeleted() {
-      if (event.target.classList.contains("elementRemoved")) {
-        var index = this.clickedRemove.indexOf(event.target.id);
-        if (index > -1) {
-          this.clickedRemove.splice(index, 1);
-        }
-        event.target.className = event.target.className.replace(
-          "elementRemoved",
-          ""
-        );
-      } else {
-        event.target.className += " elementRemoved";
-        this.clickedRemove.push(event.target.id);
-      }
-    },
-
-    addSingleImageToCanvas(event) {
-      this.clickedAdd.push({
-        id: event.target.id,
-        url: event.target.src,
-        width: event.target.naturalWidth,
-        height: event.target.naturalHeight
-      });
-      this.addAll();
-    },
-
     addAll() {
       for (var image in this.clickedAdd) {
         var src = this.clickedAdd[image].url.replace(
@@ -189,9 +83,8 @@ export default {
           this.clickedAdd[image].width,
           this.clickedAdd[image].height
         );
-
         this.images.push({
-          id: this.imageCounter++,
+          id: this.clickedAdd[image].id,
           url: src,
           width: coordinates.width,
           height: coordinates.height,
@@ -200,9 +93,42 @@ export default {
         });
       }
       this.clickedAdd = [];
+      for (var d in imagesCategorised) {
+        var selection = imagesCategorised[d];
+        for (var image in selection) {
+          selection[image].marked = false;
+        }
+      }
+    },
 
-      for (var d in this.dropdown) {
-        document.getElementById(this.dropdown[d].id).className = "element";
+    onAddImage(event) {
+      this.clickedAdd.push({
+        id: this.imageCounter++,
+        url: event.target.src,
+        width: event.target.naturalWidth,
+        height: event.target.naturalHeight
+      });
+      this.addAll();
+    },
+
+    onRemoveImage(index) {
+      this.removeImage(index);
+    },
+
+    onSelectImage(id, isSelected) {
+      if (isSelected) {
+        this.currentSelection = id;
+        this.clickedToRemove.push(id);
+        //console.log("selected image", id);
+      } else {
+        var index = this.clickedToRemove.indexOf(id);
+        if (index > -1) {
+          this.clickedToRemove.splice(index, 1);
+        }
+        event.target.className = event.target.className.replace(
+          "elementRemoved",
+          ""
+        );
       }
     },
 
@@ -219,7 +145,6 @@ export default {
 
       var x = canvas.offsetLeft + (canvas.clientWidth - newImageWidth) / 2;
       var y = canvas.offsetTop + (canvas.clientHeight - newImageHeight) / 2;
-
       return {
         x: x,
         y: y,
@@ -229,47 +154,26 @@ export default {
     },
 
     reset() {
-      var canvas = document.getElementById("canvas");
-      while (canvas.firstChild) {
-        canvas.removeChild(canvas.firstChild);
-      }
-      this.imageCounter = 0;
+      this.images = [];
     },
 
-    removeImage(canvas, imageType) {
-      if (imageType == 0) {
-        if (this.canvasImages.length > 0) {
-          var child = document.getElementById(this.canvasImages[0]);
-          canvas.removeChild(child);
-          this.canvasImages.pop();
-        }
-      } else {
-        if (this.canvasBackground.length > 0) {
-          var child = document.getElementById(this.canvasBackground[0]);
-          canvas.removeChild(child);
-          this.canvasBackground.pop();
-        }
-      }
-    },
-
-    deleteImages() {
-      for (var t in this.clickedRemove) {
-        for (var i = 0; i < this.images.length; i++) {
-          if (this.images[i].id == this.clickedRemove[t]) {
-            this.images.splice(i, 1);
+    removeImage(idToDelete) {
+      // einfach nur this.images[index] = null funktioniert nicht, wegen: https://vuejs.org/v2/guide/list.html#Caveats
+      for (var i in this.images) {
+        if (this.images[i] != null) {
+          if (this.images[i].id == idToDelete) {
+            var index = this.images.indexOf(this.images[i]);
+            Vue.set(this.images, index, null);
           }
         }
       }
-      this.clickedRemove = [];
     },
 
-    removeImageByDoubleClick(event) {
-      for (var i = 0; i < this.images.length; i++) {
-        if (this.images[i].id == event.target.id) {
-          this.images.splice(i, 1);
-        }
+    triggerRemoveImage() {
+      for (var i in this.clickedToRemove) {
+        this.removeImage(this.clickedToRemove[i]);
       }
-      this.clickedRemove = [];
+      this.clickedToRemove = [];
     },
 
     createPDF() {
@@ -294,91 +198,32 @@ export default {
         }
       });
       canvas.style.border = "1px solid black";
-    }
-  },
-  created() {
-    var defaultCategory = this.categories["Galaxy"];
-    for (var m in defaultCategory) {
-      this.dropdown.push({
-        id: defaultCategory[m],
-        url: "/static/" + defaultCategory[m],
-        marked: false
-      });
-    }
-
-    // target elements with the "draggable" class
-    interact(".resize-drag")
-      .draggable({
-        // enable inertial throwing
-        inertia: true,
-        // keep the element within the area of it's parent
-        restrict: {
-          restriction: "parent",
-          endOnly: true,
-          elementRect: { top: 0, left: 0, bottom: 1, right: 1 }
-        },
-        // enable autoScroll
-        autoScroll: true,
-
-        // call this function on every dragmove event
-        onmove: dragMoveListener,
-        // call this function on every dragend event
-        onend: function(event) {
-          var textEl = event.target.querySelector("p");
-
-          textEl &&
-            (textEl.textContent =
-              "moved a distance of " +
-              (Math.sqrt(event.dx * event.dx + event.dy * event.dy) | 0) +
-              "px");
+    },
+    mark() {
+      if (event.target.classList.contains("elementMarked")) {
+        for (var image in this.clickedAdd) {
+          var id = this.clickedAdd[image].id;
+          if (id == event.target.id) {
+            var index = this.clickedAdd.indexOf(this.clickedAdd[image]);
+            if (index > -1) {
+              this.clickedAdd.splice(index, 1);
+            }
+            document.getElementById(id).className = "selectable";
+          }
         }
-      })
-      .resizable({
-        preserveAspectRatio: true,
-        edges: { left: true, right: true, bottom: true, top: true }
-      })
-      .on("resizemove", function(event) {
-        var target = event.target,
-          x = parseFloat(target.getAttribute("data-x")) || 0,
-          y = parseFloat(target.getAttribute("data-y")) || 0;
-
-        // update the element's style
-        target.style.width = event.rect.width + "px";
-        target.style.height = event.rect.height + "px";
-
-        // translate when resizing from top or left edges
-        x += event.deltaRect.left;
-        y += event.deltaRect.top;
-
-        target.style.webkitTransform = target.style.transform =
-          "translate(" + x + "px," + y + "px)";
-
-        target.setAttribute("data-x", x);
-        target.setAttribute("data-y", y);
-        target.textContent =
-          Math.round(event.rect.width) + "×" + Math.round(event.rect.height);
-      })
-      .on("tap", this.markDeleted.bind(this));
-
-    //.on('dbltap', this.removeI.bind(this));
-
-    function dragMoveListener(event) {
-      var target = event.target,
-        // keep the dragged position in the data-x/data-y attributes
-        x = (parseFloat(target.getAttribute("data-x")) || 0) + event.dx,
-        y = (parseFloat(target.getAttribute("data-y")) || 0) + event.dy;
-
-      // translate the element
-      target.style.webkitTransform = target.style.transform =
-        "translate(" + x + "px, " + y + "px)";
-
-      // update the posiion attributes
-      target.setAttribute("data-x", x);
-      target.setAttribute("data-y", y);
+      } else {
+        event.target.className += " elementMarked";
+        this.clickedAdd.push({
+          id: event.target.id,
+          url: event.target.src,
+          width: event.target.naturalWidth,
+          height: event.target.naturalHeight
+        });
+      }
+    },
+    markDeleted() {
+      //alert(event.target.classList);
     }
-
-    // this is used later in the resizing and gesture demos
-    window.dragMoveListener = dragMoveListener;
   }
 };
 </script>
@@ -394,22 +239,6 @@ export default {
   fill: currentColor;
 }
 
-.element:hover {
-  opacity: 0.85;
-}
-
-.elementMarked {
-  opacity: 0.5;
-}
-
-.elementRemoved {
-  opacity: 0.5;
-}
-
-.elementNotRemoved {
-  opacity: 1;
-}
-
 button {
   background-color: rgba(41, 56, 80, 1);
   padding: 0px;
@@ -419,58 +248,40 @@ button {
   background-repeat: no-repeat;
   background-position: center;
 }
-
-.buttonSmall {
-  width: 20%;
-}
-
-.buttonBig {
-  width: 40%;
-}
-
 button:hover {
   background-color: black;
   /*color: black; */
 }
-
 button:focus {
   color: white;
-}
-
-#addButton {
-  background-image: url("/static/hinzufuegen-button.png");
-}
-
-#resetButton {
-  background-image: url("/static/reset-button.png");
-}
-
-#deleteButton {
-  background-image: url("/static/delete-button.png");
-}
-
-.resize-drag {
-  position: absolute;
-}
-
-.resize-drag:hover {
-  opacity: 0.5;
-  border: black dashed 0.5px;
-}
-
-#categories {
-  margin-left: 0px;
-  margin-top: 5px;
-  width: 230px;
-}
-
-#category {
-  width: 100%;
 }
 
 #allButtons {
   display: flex;
   justify-content: center;
+  margin-top: 5px;
+  width: 230px;
+}
+
+.buttonSmall {
+  width: 20%;
+}
+.buttonBig {
+  width: 40%;
+}
+
+#addButton {
+  background-image: url("/static/hinzufuegen-button.png");
+}
+#resetButton {
+  background-image: url("/static/reset-button.png");
+}
+#deleteButton {
+  background-image: url("/static/delete-button.png");
+}
+
+#categories {
+  margin-left: 0px;
   margin-top: 5px;
   width: 230px;
 }
@@ -487,12 +298,6 @@ button:focus {
   height: 324px;
 }
 
-#test {
-  width: 1000px;
-  height: 1000px;
-  position: absolute;
-}
-
 #elementsOfChoice {
   padding: 5px;
   border: 0.5px solid black;
@@ -502,12 +307,6 @@ button:focus {
   margin-left: 0px;
   overflow-x: scroll;
   white-space: nowrap;
-}
-
-.element {
-  height: 60px;
-  margin-top: 9px;
-  margin-right: 5px;
 }
 
 #logo {
@@ -548,12 +347,6 @@ button:focus {
     margin-left: 0px;
     overflow-x: scroll;
     white-space: nowrap;
-  }
-
-  .element {
-    height: 85px;
-    margin-top: 8px;
-    margin-right: 6px;
   }
 
   .buttons {
@@ -598,12 +391,6 @@ button:focus {
     white-space: nowrap;
   }
 
-  .element {
-    height: 90px;
-    margin-top: 9px;
-    margin-right: 7px;
-  }
-
   .buttons {
     width: 430px;
   }
@@ -643,15 +430,6 @@ button:focus {
     overflow-y: scroll;
     margin-top: 0px;
     margin-left: 10px;
-  }
-
-  .element {
-    height: auto;
-    width: 120px;
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
-    margin-bottom: 10px;
   }
 
   #logo {
@@ -704,14 +482,6 @@ button:focus {
     overflow-y: scroll;
   }
 
-  .element {
-    width: 130px;
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
-    margin-bottom: 10px;
-  }
-
   .buttons {
     width: 502px;
   }
@@ -750,14 +520,6 @@ button:focus {
     height: 844px;
     margin-left: 15px;
     overflow-y: scroll;
-  }
-
-  .element {
-    width: 140px;
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
-    margin-bottom: 10px;
   }
 
   .buttons {

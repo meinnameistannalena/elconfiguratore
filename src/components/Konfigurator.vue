@@ -141,8 +141,8 @@ export default {
       var newImageHeight = 0;
       var newImageWidth = 0;
       if (naturalImageWidth > naturalImageHeight) {
-        newImageHeight = canvas.clientHeight * this.transformingFactorX;
-        newImageWidth = newImageHeight / naturalImageHeight * naturalImageWidth;
+        newImageWidth = canvas.clientWidth * this.transformingFactorX;
+        newImageHeight = newImageWidth / naturalImageWidth * naturalImageHeight;
       } else {
         newImageHeight = canvas.clientHeight * this.transformingFactorY;
         newImageWidth = newImageHeight / naturalImageHeight * naturalImageWidth;
@@ -186,14 +186,14 @@ export default {
       var images = canvas.childNodes;
       for (var i in images) {
         if (images[i] instanceof HTMLImageElement) {
-          images[i].className = "selectable";
+          images[i].className = "resize-drag";
         }
       }
 
       canvas.style.border = "none";
 
       html2canvas(canvas, {
-        scale: 2,
+        scale: 5,
         onrendered: function(canvas) {
           var doc = new jspdf();
           //doc.internal.scaleFactor = 1.33; tut das was?

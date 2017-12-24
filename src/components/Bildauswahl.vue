@@ -1,14 +1,16 @@
 <template>
 
   <div>
-    <select v-model="selected" id="category" v-on:change="changeCategory(categories, clickedAdd)">
+    <select v-model="selected" id="category" v-on:change="changeCategory">
       <option v-for="(value, key, index) in categories" :value="key">
         {{ key }}
       </option>
     </select>
     <ul>
-      <li v-for="(image, key, index) in categories[selected]" >
-        <img :key="image.src" :id="image.src" :src="image.src" :class="image.marked ? 'selectable elementMarked' : 'selectable'" @dblclick="emitImageSelection" @click="emitImageMarked">
+      <li v-for="(image, key, index) in categories[selected]">
+        <img :key="image.src" :id="image.src" :src="image.src"
+             :class="image.marked ? 'selectable elementMarked' : 'selectable'"
+             @dblclick="emitImageSelection" @click="emitImageMarked(image)">
       </li>
     </ul>
   </div>
@@ -17,10 +19,11 @@
 
 <script>
 import imagesCategorised from "../imagesCategories";
+import _ from "lodash";
 
 export default {
   name: "Bildauswahl",
-  props: ["categories", "clickedAdd", "imageToAddExists"],
+  props: ["categories"],
   data: () => {
     return {
       selected: "Galaxy",
@@ -31,19 +34,20 @@ export default {
     emitImageSelection(event) {
       this.$emit("selection", event);
     },
-    emitImageMarked(event) {
-      this.$emit("imageMarked", event);
+    emitImageMarked(image) {
+      this.resetMarking();
+      image.marked = true;
+      this.$emit("imageMarked", image);
     },
-    changeCategory(categories, clickedAdd) {
-      var selection = categories[this.selected];
-      for (var i in selection) {
-        for (var add in clickedAdd) {
-          var id = this.clickedAdd[add].id;
-          if (selection[i].src == id) {
-            selection[i].marked = true;
-          }
-        }
-      }
+    resetMarking() {
+      _.forEach(imagesCategorised, (category) => {
+        _.forEach(category, (image) => {
+          image.marked = false;
+        })
+      });
+    },
+    changeCategory() {
+      this.resetMarking();
     }
   }
 };

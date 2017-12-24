@@ -1,7 +1,7 @@
 class Image {
   constructor(src) {
     this._src = src;
-    this.marked=false;
+    this.marked = false;
   }
 
   get src() {
@@ -13,4 +13,5 @@ class Image {
   }
 
 }
+
 export default Image;

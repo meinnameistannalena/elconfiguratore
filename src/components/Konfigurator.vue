@@ -7,7 +7,7 @@
     <div class="container">
 
       <div class="row">
-    
+
         <Leinwand :images="images" v-on:removeImage="onRemoveImage" v-on:selectImage="onSelectImage"/>
 
         <div id="elementsOfChoice" class="four columns">
@@ -210,7 +210,7 @@ export default {
       });
       canvas.style.border = "1px solid black";
     },
-    mark() {
+    mark(event) {
       if (event.target.classList.contains("elementMarked")) {
         for (var image in this.clickedAdd) {
           var id = this.clickedAdd[image].id;

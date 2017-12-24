@@ -32,7 +32,7 @@ export default {
       this.$emit("selection", event);
     },
     emitImageMarked(event) {
-      this.$emit("imageMarked");
+      this.$emit("imageMarked", event);
     },
     changeCategory(categories, clickedAdd) {
       var selection = categories[this.selected];

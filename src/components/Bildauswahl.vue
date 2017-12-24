@@ -10,7 +10,7 @@
       <li v-for="(image, key, index) in categories[selected]">
         <img :key="image.src" :id="image.src" :src="image.src"
              :class="image.marked ? 'selectable elementMarked' : 'selectable'"
-             @dblclick="emitImageSelection" @click="emitImageMarked(image)">
+             @dblclick="emitImageSelection" @click="emitImageMarked(image, $event)">
       </li>
     </ul>
   </div>
@@ -34,10 +34,10 @@ export default {
     emitImageSelection(event) {
       this.$emit("selection", event);
     },
-    emitImageMarked(image) {
+    emitImageMarked(image, event) {
       this.resetMarking();
       image.marked = true;
-      this.$emit("imageMarked", image);
+      this.$emit("imageMarked", image, event.target);
     },
     resetMarking() {
       _.forEach(imagesCategorised, (category) => {

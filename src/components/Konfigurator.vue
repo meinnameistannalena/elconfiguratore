@@ -68,22 +68,22 @@
         images: [],
         categories: imagesCategorised,
         currentSelection: null,
-        markedImage: null,
+        markedImage: {},
         imageToAddExists: false
       };
     },
 
     methods: {
       addMarkedImage() {
-        const src = this.markedImage.src;
+        const src = this.markedImage.imageObject.src;
         const canvas = document.getElementById("canvas");
         const coordinates = this.calculateCoordinates(
           canvas,
-          this.markedImage.width,
-          this.markedImage.height
+          this.markedImage.imageElement.width,
+          this.markedImage.imageElement.height
         );
         this.images.push({
-          id: this.markedImage.id,
+          id: this.markedImage.imageElement.id,
           url: src,
           width: coordinates.width,
           height: coordinates.height,
@@ -102,7 +102,7 @@
           this.clickedToRemove.push(id);
           //console.log("selected image", id);
         } else {
-          var index = this.clickedToRemove.indexOf(id);
+          const index = this.clickedToRemove.indexOf(id);
           if (index > -1) {
             this.clickedToRemove.splice(index, 1);
           }
@@ -114,8 +114,8 @@
       },
 
       calculateCoordinates(canvas, naturalImageWidth, naturalImageHeight) {
-        var newImageHeight = 0;
-        var newImageWidth = 0;
+        let newImageHeight = 0;
+        let newImageWidth = 0;
         if (naturalImageWidth > naturalImageHeight) {
           newImageWidth = canvas.clientWidth * this.transformingFactorX;
           newImageHeight = newImageWidth / naturalImageWidth * naturalImageHeight;
@@ -124,8 +124,8 @@
           newImageWidth = newImageHeight / naturalImageHeight * naturalImageWidth;
         }
 
-        var x = canvas.offsetLeft + (canvas.clientWidth - newImageWidth) / 2;
-        var y = canvas.offsetTop + (canvas.clientHeight - newImageHeight) / 2;
+        const x = canvas.offsetLeft + (canvas.clientWidth - newImageWidth) / 2;
+        const y = canvas.offsetTop + (canvas.clientHeight - newImageHeight) / 2;
         return {
           x: x,
           y: y,
@@ -140,10 +140,10 @@
 
       removeImage(idToDelete) {
         // einfach nur this.images[index] = null funktioniert nicht, wegen: https://vuejs.org/v2/guide/list.html#Caveats
-        for (var i in this.images) {
+        for (const i in this.images) {
           if (this.images[i] != null) {
-            if (this.images[i].id == idToDelete) {
-              var index = this.images.indexOf(this.images[i]);
+            if (this.images[i].id === idToDelete) {
+              const index = this.images.indexOf(this.images[i]);
               Vue.set(this.images, index, null);
             }
           }
@@ -151,16 +151,16 @@
       },
 
       triggerRemoveImage() {
-        for (var i in this.clickedToRemove) {
+        for (const i in this.clickedToRemove) {
           this.removeImage(this.clickedToRemove[i]);
         }
         this.clickedToRemove = [];
       },
 
       createPDF() {
-        var canvas = document.getElementById("canvas");
-        var images = canvas.childNodes;
-        for (var i in images) {
+        const canvas = document.getElementById("canvas");
+        const images = canvas.childNodes;
+        for (const i in images) {
           if (images[i] instanceof HTMLImageElement) {
             images[i].className = "resize-drag";
           }
@@ -186,8 +186,11 @@
         });
         canvas.style.border = "1px solid black";
       },
-      mark(image) {
-        this.markedImage = image;
+      mark(imageObject, imageElement) {
+        this.markedImage = {
+          imageObject: imageObject,
+          imageElement: imageElement
+        };
       }
     }
   };

@@ -136,4 +136,99 @@ img {
 .elementNotRemoved {
   opacity: 1;
 }
+
+#canvas {
+  border: 0.5px solid black;
+  width: 227px;
+  height: 324px;
+}
+
+#logo {
+  width: 70px;
+  position: absolute;
+  top: 300px;
+  left: 160px;
+}
+
+
+/* 320 x 480 (mobile)*/
+@media (min-width: 320px) {
+
+  #canvas {
+    width: 320px;
+    height: 444px;
+  }
+
+  #logo {
+    width: 100px;
+    position: absolute;
+    top: 410px;
+    left: 190px;
+  }
+}
+
+/* 480 x 640 (small tablet) UNTEREINANDER*/
+@media (min-width: 480px) {
+  #canvas {
+    width: 430px;
+    height: 606px;
+    background-color: white;
+  }
+
+  #logo {
+    width: 120px;
+    position: absolute;
+    top: 560px;
+    left: 280px;
+  }
+}
+
+/* 768 x 1024 (tablet - portrait) NEBENEINANDER*/
+@media (min-width: 768px) {
+
+  #canvas {
+    width: 405px;
+    height: 571px;
+  }
+
+  #logo {
+    width: 130px;
+    position: absolute;
+    top: 520px;
+    left: 235px;
+  }
+}
+
+/* 1024 x 768 (tablet - landscape)    */
+@media (min-width: 1024px) {
+  #canvas {
+    width: 502px;
+    height: 707px;
+  }
+
+  #logo {
+    width: 130px;
+    position: absolute;
+    top: 650px;
+    left: 330px;
+  }
+}
+
+/* Larger than Desktop HD */
+@media (min-width: 1200px) {
+
+  #canvas {
+    width: 599px;
+    height: 844px;
+  }
+
+  #logo {
+    width: 140px;
+    position: absolute;
+    top: 785px;
+    left: 410px;
+  }
+}
+
+
 </style>

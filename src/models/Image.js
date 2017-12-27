@@ -5,7 +5,7 @@ class Image {
   }
 
   get src() {
-    return "/static/" + this._src;
+    return "https://www.fingerfuchs.com/wp-content/uploads/konfigurator/static/" + this._src;
   }
 
   set src(value) {

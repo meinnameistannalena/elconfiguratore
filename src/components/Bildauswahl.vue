@@ -6,7 +6,7 @@
         {{ key }}
       </option>
     </select>
-    <ul id="imageColumn">
+    <ul id="imageColumn" :style="{height: height}">
       <li v-for="(image, key, index) in categories[selected]">
         <img :key="image.src" :id="image.src" :src="image.src"
              :class="image.marked ? 'selectable elementMarked' : 'selectable'"
@@ -23,7 +23,7 @@
 
   export default {
     name: "Bildauswahl",
-    props: ["categories"],
+    props: ["categories", "height"],
     data: () => {
       return {
         selected: "Galaxy",
@@ -67,12 +67,12 @@
     padding: 0;
     border: 1px solid #ccc;
     list-style: none;
-    padding: 1rem;
+    overflow: scroll;
   }
 
   img {
     max-width: 100%;
-    margin-bottom: 1rem;
+    margin-bottom: 0.5rem;
   }
 
 </style>

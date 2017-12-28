@@ -17,11 +17,11 @@
             Download
           </button>
         </div>
-        <Leinwand :images="images" v-on:removeImage="onRemoveImage" v-on:selectImage="onSelectImage"/>
+        <Leinwand ref="leinwand" :images="images" v-on:removeImage="onRemoveImage" v-on:selectImage="onSelectImage"/>
       </div>
 
       <div id="elementsOfChoice">
-        <Bildauswahl :categories="categories" v-on:selection="addMarkedImage"
+        <Bildauswahl ref="bildauswahl" :height="canvasHeight" :categories="categories" v-on:selection="addMarkedImage"
                      v-on:imageMarked="mark"/>
       </div>
     </div>
@@ -61,10 +61,20 @@
         categories: imagesCategorised,
         currentSelection: null,
         markedImage: {},
-        imageToAddExists: false
+        imageToAddExists: false,
+        canvasHeight: null
       };
     },
-
+    mounted() {
+      /**
+       * nachdem die Komponente das erste Mal gerendert wurde, setCanvasHeight aufraufen und
+       * bei Event aufsetzen, so dass setCanvasHeight auch bei Änderung der Fenstergröße erneut aufgerufen wird
+       */
+      this.setCanvasHeight();
+      window.addEventListener("resize", () => {
+        this.setCanvasHeight();
+      }, true);
+    },
     methods: {
       addMarkedImage() {
         const src = this.markedImage.imageObject.src;
@@ -85,7 +95,9 @@
 
         this.resetMarking();
       },
-
+      setCanvasHeight() {
+        this.canvasHeight = this.$refs.leinwand.$el.clientHeight + "px";
+      },
       resetMarking() {
         _.forEach(imagesCategorised, category => {
           _.forEach(category, image => {

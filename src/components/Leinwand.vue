@@ -142,6 +142,7 @@
 
   #canvas {
     border: 1px solid #ccc;
+    background-color: white;
   }
 
   img {
@@ -156,5 +157,9 @@
     opacity: 0.5;
     border: black dashed 0.5px;
   }
+
+  .elementRemoved{
+    border: red solid 5px;
+}
 
 </style>

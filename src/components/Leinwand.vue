@@ -1,13 +1,21 @@
 <template>
   <div class="aspect-wrapper">
     <div class="aspect-ratio-7-to-10"></div>
+    
     <div id="canvas" class="aspect-content">
       <img v-for="(value, index) in images" v-if="value !== null" :key="index"
            :src="value.url" :id="value.id" :width="value.width" :height="value.height"
            v-bind:style="{ left: value.left + 'px', top: value.top + 'px' }" class="resize-drag"
            @dblclick="removeImage(index)"
       >
+      
+<img id="logo" src="https://www.fingerfuchs.com/wp-content/uploads/konfigurator/static/fingerfuchsLogo.png"
+      >
+      
     </div>
+   
+
+   
   </div>
 </template>
 
@@ -55,6 +63,10 @@
         })
         .resizable({
           preserveAspectRatio: true,
+           restrict: {
+            restriction: "parent",
+           
+          },
           edges: {left: true, right: true, bottom: true, top: true}
         })
         .on("resizemove", function (event) {
@@ -127,7 +139,7 @@
     position: relative;
     width: 100%;
   }
-
+  
   .aspect-ratio-7-to-10 {
     padding-bottom: 140%;
   }
@@ -140,9 +152,18 @@
     right: 0;
   }
 
+  #logo{
+    position: absolute;
+    width: 50%;
+    top: 93%;
+    bottom: 0;
+    left: 47%;
+    right: 0;
+  }
+
   #canvas {
-    border: 1px solid #ccc;
-    background-color: white;
+    /*border: 1px solid #ccc;*/
+    background-color: black;
   }
 
   img {
@@ -159,7 +180,7 @@
   }
 
   .elementRemoved{
-    border: red solid 5px;
+    border: red solid 2px;
 }
 
 </style>

@@ -1,7 +1,9 @@
 <template>
 
-  <div class="konfigurator">
-    <div class="grid-container">
+  <div class="konfigurator"> 
+    <p><span id="ueberschrift">Sticker Konfigurator </span><a class="floatingLink" href="https://www.fingerfuchs.com/sticker-konfigurator/">HOW TO</a></p>
+    
+   <div class="grid-container">
       <div>
         <div id="allButtons">
           <button id="addButton" class="buttonSmall" @click="addMarkedImage">
@@ -24,7 +26,10 @@
         <Bildauswahl ref="bildauswahl" :height="canvasHeight" :categories="categories" v-on:selection="addMarkedImage"
                      v-on:imageMarked="mark"/>
       </div>
+     
     </div>
+     
+
   </div>
 </template>
 
@@ -36,7 +41,6 @@ import imagesCategorised from "../imagesCategories";
 import Leinwand from "./Leinwand";
 import Bildauswahl from "./Bildauswahl";
 
-/*import html2canvas from "html2canvas";*/
 import html2canvas from "../../vendor/html2canvas";
 import jspdf from "jspdf";
 
@@ -46,12 +50,14 @@ export default {
     Leinwand,
     Bildauswahl
   },
-
+  entry: {
+    app: ["babel-polyfill", "./src/main.js"]
+  },
   data() {
     this.clickedToRemove = [];
 
-    this.transformingFactorX = 0.3;
-    this.transformingFactorY = 0.5;
+    this.transformingFactorX = 0.4;
+    this.transformingFactorY = 0.3;
 
     this.imageCounter = 0;
 
@@ -68,9 +74,9 @@ export default {
   },
   mounted() {
     /**
-       * nachdem die Komponente das erste Mal gerendert wurde, setCanvasHeight aufraufen und
-       * bei Event aufsetzen, so dass setCanvasHeight auch bei Änderung der Fenstergröße erneut aufgerufen wird
-       */
+     * nachdem die Komponente das erste Mal gerendert wurde, setCanvasHeight aufraufen und
+     * bei Event aufsetzen, so dass setCanvasHeight auch bei Änderung der Fenstergröße erneut aufgerufen wird
+     */
     this.setCanvasHeight();
     window.addEventListener(
       "resize",
@@ -101,7 +107,7 @@ export default {
       this.resetMarking();
     },
     setCanvasHeight() {
-      this.canvasHeight = this.$refs.leinwand.$el.clientHeight - 2 + "px";
+      this.canvasHeight = this.$refs.leinwand.$el.clientHeight + "px";
     },
     resetMarking() {
       _.forEach(imagesCategorised, category => {
@@ -178,32 +184,32 @@ export default {
 
     createPDF() {
       const canvas = document.getElementById("canvas");
+
       const images = canvas.childNodes;
       for (const i in images) {
         if (images[i] instanceof HTMLImageElement) {
+          if(images[i].id != "logo"){
           images[i].className = "resize-drag";
+          }
         }
       }
 
-      canvas.style.border = "none";
+      var options = {
+        scale: 5
+      };
 
-      html2canvas(canvas, {
-        scale: 5,
-        onrendered: function(canvas) {
-          var doc = new jspdf();
-          //doc.internal.scaleFactor = 1.33; tut das was?
-          doc.addImage(
-            canvas.toDataURL("image/png"),
-            "JPEG",
-            10,
-            14.5,
-            190,
-            268
-          );
-          doc.save("output.pdf");
-        }
+      //canvas.style.border = "1px solid white";
+      html2canvas(canvas, options).then(function(x) {
+        document.body.appendChild(x);
+        var doc = new jspdf();
+        doc.addImage(x.toDataURL("image/png"), "JPEG", 10, 14.5, 190, 268);
+        doc.save("fingerfuchs-sticker.pdf");
+        
+        //canvas.style.border = "1px solid #ccc";
       });
-      canvas.style.border = "1px solid black";
+
+      // document.body.appendChild(canvas);*/
+      //doc.internal.scaleFactor = 1.33; tut das was?
     },
     mark(imageObject, imageElement) {
       this.markedImage = {
@@ -217,6 +223,10 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+body {
+    margin: 0px;
+}
+
 .konfigurator {
   width: 98vw;
   position: relative;
@@ -252,6 +262,20 @@ button:focus {
 button > img {
   height: 1rem;
   margin-top: 0.5rem;
+}
+
+#ueberschrift{
+   font-size: 25px;
+    font-weight: 700;
+   font-family: 'Oswald', sans-serif;
+   line-height: 1.5;
+}
+
+.floatingLink {
+   font-size: 14px;
+   font-family: 'Open Sans', sans-serif;
+   line-height: 1.5;
+   float: right;
 }
 
 #allButtons {

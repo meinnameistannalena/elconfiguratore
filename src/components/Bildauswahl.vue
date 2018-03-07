@@ -13,6 +13,7 @@
              @dblclick="emitImageSelection" @click="emitImageMarked(image, $event)">
       </li>
     </ul>
+  
   </div>
 
 </template>
@@ -26,7 +27,7 @@ export default {
   props: ["categories", "height"],
   data: () => {
     return {
-      selected: "Galaxy",
+      selected: "Ostern",
       dropdown: []
     };
   },
@@ -67,7 +68,7 @@ select {
 #imageColumn {
   background-color: white;
   padding: 0;
-  border: 1px solid #ccc;
+  /*border: 1px solid #ccc;*/
   list-style: none;
   overflow: scroll;
   margin: 0px;
@@ -86,8 +87,13 @@ select {
   transform: scale(1.15);
 }
 
+#logo {
+    position: absolute;   
+}
+
 /* 320 x 480 (mobile)*/
 @media (min-width: 320px) {
+
 }
 
 /* 480 x 640 (small tablet) UNTEREINANDER*/
